@@ -13,8 +13,7 @@
     }
   },
   "files": [
-    "dist",
-    "README.md"
+    "dist"
   ],
   "scripts": {
     "build": "NODE_NO_WARNINGS=1 tsc -b && NODE_NO_WARNINGS=1 tsx bundle.ts",

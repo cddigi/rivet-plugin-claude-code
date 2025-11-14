@@ -123,6 +123,13 @@ if (process.argv.includes("--watch")) {
   await esbuild.build(isomorphicOptions);
   await esbuild.build(nodeOptions);
 
+  // Copy README.md to dist for package distribution
+  await copyFile(
+    join(__dirname, "README.md"),
+    join(__dirname, "dist", "README.md")
+  );
+
   console.log("Built isomorphic bundle: dist/bundle.js");
   console.log("Built Node.js bundle: dist/ClaudeCodeHeadlessNode.node.js");
+  console.log("Copied README.md to dist/");
 }

@@ -91,9 +91,8 @@ async function executeClaude(options) {
       // 10MB buffer for large responses
       timeout: 3e5,
       // 5 minute timeout
-      env: { ...process.env, CI: "true" },
+      env: { ...process.env, CI: "true" }
       // Set CI env to prevent interactive prompts
-      shell: true
     });
     console.log("[Claude Code Plugin] Command completed");
     if (stderr) {

@@ -88,8 +88,7 @@ function claudeCodeHeadlessNode(rivet) {
         contextMenuTitle: "Claude Code Headless",
         group: "Claude",
         infoBoxBody: "Execute Claude Code in headless mode. Supports prompts, session management, tool control, and MCP integration.",
-        infoBoxTitle: "Claude Code Headless Node",
-        infoBoxImageUri: "image.png"
+        infoBoxTitle: "Claude Code Headless Node"
       };
     },
     getEditors(data) {

@@ -26,6 +26,9 @@ import type {
   ClaudeExecutionResult,
 } from "./ClaudeCodeHeadlessNode.node.js";
 
+// Import the image as a data URI
+import { imageDataUrl } from "../assets/image.js";
+
 /**
  * Claude Code Headless Node
  *
@@ -211,7 +214,7 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
         infoBoxBody:
           "Execute Claude Code in headless mode. Supports prompts, session management, tool control, and MCP integration.",
         infoBoxTitle: "Claude Code Headless Node",
-        infoBoxImageUri: "image.png",
+        infoBoxImageUri: imageDataUrl,
       };
     },
 

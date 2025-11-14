@@ -102,13 +102,14 @@ async function executeClaude(options) {
     if (internalFormat === "json" || internalFormat === "stream-json") {
       try {
         const jsonOutput = JSON.parse(stdout);
-        response = jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
+        response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
         metadata = {
-          cost: jsonOutput.cost,
-          duration: jsonOutput.duration,
+          cost: jsonOutput.total_cost_usd,
+          duration: jsonOutput.duration_ms,
           session_id: jsonOutput.session_id,
           model: jsonOutput.model,
-          ...jsonOutput.metadata
+          usage: jsonOutput.usage,
+          modelUsage: jsonOutput.modelUsage
         };
         extractedSessionId = jsonOutput.session_id || "";
         if (outputFormat === "text") {

@@ -19,7 +19,8 @@ async function executeClaude(options) {
       );
     }
     const args = ["claude", "--print"];
-    args.push("--output-format", outputFormat);
+    const internalFormat = options.enableResume ? "json" : outputFormat;
+    args.push("--output-format", internalFormat);
     if (options.model) {
       args.push("--model", options.model);
     }
@@ -51,7 +52,7 @@ async function executeClaude(options) {
             `Invalid session ID format: ${sessionId}. Must be a valid UUID.`
           );
         }
-        args.push("--resume", sessionId);
+        args.push("--session-id", sessionId);
       }
     }
     if (mcpConfig) {
@@ -98,10 +99,10 @@ async function executeClaude(options) {
     let response = "";
     let metadata = {};
     let extractedSessionId = "";
-    if (outputFormat === "json" || outputFormat === "stream-json") {
+    if (internalFormat === "json" || internalFormat === "stream-json") {
       try {
         const jsonOutput = JSON.parse(stdout);
-        response = jsonOutput.response || jsonOutput.content || stdout;
+        response = jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
         metadata = {
           cost: jsonOutput.cost,
           duration: jsonOutput.duration,
@@ -110,7 +111,11 @@ async function executeClaude(options) {
           ...jsonOutput.metadata
         };
         extractedSessionId = jsonOutput.session_id || "";
+        if (outputFormat === "text") {
+          console.log("[Claude Code Plugin] Converted JSON to text for user, keeping session ID:", extractedSessionId);
+        }
       } catch (parseError) {
+        console.error("[Claude Code Plugin] JSON parsing failed:", parseError);
         response = stdout;
       }
     } else {

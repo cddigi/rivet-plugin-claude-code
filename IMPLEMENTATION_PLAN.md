@@ -15,7 +15,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 1: Core Node Type Definition
 **Goal**: Define the TypeScript types for ClaudeCodeHeadlessNode
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Create `src/nodes/ClaudeCodeHeadlessNode.ts`
@@ -54,7 +54,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 2: Basic Node Structure Implementation
 **Goal**: Implement create(), getUIData(), getBody(), and getEditors() methods
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Implement `create()` method:
@@ -99,7 +99,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 3: Input/Output Port Definitions
 **Goal**: Define all input and output ports for the node
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Implement `getInputDefinitions()`:
@@ -128,7 +128,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 4: Core Process Method - Basic Execution
 **Goal**: Implement the process() method with basic Claude CLI execution
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Setup input data extraction:
@@ -182,7 +182,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 5: Advanced CLI Options Implementation
 **Goal**: Add support for tools control, fallback model, and permission modes
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Add tools control to CLI command builder:
@@ -220,7 +220,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 6: Session Management Implementation
 **Goal**: Implement resume/continue functionality for multi-turn conversations
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Add session management to CLI command builder:
@@ -262,7 +262,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 7: MCP and System Prompt Advanced Features
 **Goal**: Implement MCP config support and advanced system prompt handling
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Add MCP config support:
@@ -345,7 +345,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 9: Error Handling and Validation
 **Goal**: Comprehensive error handling for all execution paths
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Add pre-execution validation:
@@ -438,7 +438,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 11: Plugin Integration and Configuration
 **Goal**: Integrate the new node into the plugin and update configuration
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Update `src/index.ts`:
@@ -528,7 +528,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 13: Build, Bundle, and Release Preparation
 **Goal**: Prepare the plugin for distribution
-**Status**: Not Started
+**Status**: Complete
 
 ### Tasks:
 1. Run build process:

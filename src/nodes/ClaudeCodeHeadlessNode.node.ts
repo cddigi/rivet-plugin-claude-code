@@ -177,16 +177,17 @@ export async function executeClaude(
       try {
         const jsonOutput = JSON.parse(stdout);
 
-        // Extract response text
-        response = jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
+        // Extract response text - Claude CLI uses 'result' field
+        response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
 
         // Extract metadata
         metadata = {
-          cost: jsonOutput.cost,
-          duration: jsonOutput.duration,
+          cost: jsonOutput.total_cost_usd,
+          duration: jsonOutput.duration_ms,
           session_id: jsonOutput.session_id,
           model: jsonOutput.model,
-          ...jsonOutput.metadata,
+          usage: jsonOutput.usage,
+          modelUsage: jsonOutput.modelUsage,
         };
 
         extractedSessionId = jsonOutput.session_id || "";

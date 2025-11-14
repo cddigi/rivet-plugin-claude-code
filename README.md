@@ -119,24 +119,92 @@ The Claude Code Headless node executes Claude Code in headless mode and returns 
 
 ### Input Ports
 
-All input ports are conditional and appear when their corresponding "use input" toggle is enabled:
+All input ports are **conditional** and only appear when their corresponding "use input" toggle is enabled in the node editor. This allows you to connect dynamic values from other nodes in your graph.
 
-| Port | Type | Description |
-|------|------|-------------|
-| **Prompt** | string | Dynamic prompt input (when usePromptInput is enabled) |
-| **System Prompt** | string | Dynamic system prompt (when useSystemPromptInput is enabled) |
-| **Session ID** | string | Dynamic session ID (when useSessionIdInput is enabled) |
-| **MCP Config** | string | Dynamic MCP configuration (when useMcpConfigInput is enabled) |
+| Port | Type | Toggle Setting | Description |
+|------|------|----------------|-------------|
+| **Prompt** | string | `usePromptInput` | Dynamic prompt input. Overrides the static prompt field when connected. |
+| **System Prompt** | string | `useSystemPromptInput` | Dynamic system prompt. Overrides the static system prompt field when connected. |
+| **Session ID** | string | `useSessionIdInput` | Dynamic session ID for resuming conversations. Must be a valid UUID. |
+| **MCP Config** | string | `useMcpConfigInput` | Dynamic MCP configuration. Can be a file path or JSON string. |
+
+**Example:** To create a dynamic prompt from user input, enable the "Use Prompt Input" toggle and connect a Text node or user input to the Prompt port.
 
 ### Output Ports
 
-| Port | Type | Description |
-|------|------|-------------|
-| **Response** | string | The text response from Claude |
-| **Metadata** | object | JSON metadata including cost, duration, session_id, model |
-| **Success** | boolean | Whether execution succeeded |
-| **Error** | string | Error message if execution failed (empty on success) |
-| **Session ID** | string | The session ID used or created for this execution |
+All output ports are **always available** and provide different aspects of the Claude execution result.
+
+| Port | Type | Always Present | Description | Example Value |
+|------|------|----------------|-------------|---------------|
+| **Response** | string | ✅ | The response from Claude. Format depends on Output Format setting. | Text: `"Hello! How can I help?"` <br> JSON: `{"type":"result","result":"..."}` <br> Stream-JSON: JSONL stream |
+| **Metadata** | object | ✅ | Execution metadata including cost, duration, and usage statistics. | `{"cost": 0.0063, "duration": 2257, "session_id": "...", "usage": {...}}` |
+| **Success** | boolean | ✅ | `true` if execution succeeded, `false` if an error occurred. | `true` or `false` |
+| **Error** | string | ✅ | Error message if execution failed. Empty string on success. | `""` (success) or `"Claude CLI not found..."` (error) |
+| **Session ID** | string | ✅ | UUID of the session. Populated when Session Management is enabled. | `"354f251b-b47f-4552-b01d-74ccd2533ded"` |
+
+#### Output Format Behavior
+
+The **Response** port returns different formats based on the **Output Format** setting:
+
+**Text Format:**
+```
+Hello! How can I help you today?
+```
+
+**JSON Format:**
+```json
+{
+  "type": "result",
+  "subtype": "success",
+  "is_error": false,
+  "duration_ms": 2257,
+  "result": "Hello! How can I help you today?",
+  "session_id": "354f251b-b47f-4552-b01d-74ccd2533ded",
+  "total_cost_usd": 0.0063495,
+  "usage": {
+    "input_tokens": 1,
+    "output_tokens": 39,
+    ...
+  }
+}
+```
+
+**Stream-JSON Format:**
+```jsonl
+{"type":"text","text":"Hello"}
+{"type":"text","text":"!"}
+{"type":"text","text":" How"}
+...
+{"type":"result","result":"Hello! How can I help you today?","session_id":"..."}
+```
+
+#### Metadata Object Structure
+
+The **Metadata** port always returns an object with the following structure:
+
+```json
+{
+  "cost": 0.0063495,              // Total cost in USD
+  "duration": 2257,                // Execution time in milliseconds
+  "session_id": "354f251b-...",   // Session UUID
+  "model": "claude-sonnet-4-5-20250929",  // Model used
+  "usage": {
+    "input_tokens": 1,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 19205,
+    "output_tokens": 39
+  },
+  "modelUsage": {
+    "claude-sonnet-4-5-20250929": {
+      "inputTokens": 1,
+      "outputTokens": 39,
+      "costUSD": 0.0063495
+    }
+  }
+}
+```
+
+**Note:** Metadata is extracted from JSON output even when using text format (if Session Management is enabled).
 
 ## Usage Examples
 

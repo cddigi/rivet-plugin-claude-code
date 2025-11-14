@@ -72,12 +72,13 @@ const syncPlugin: esbuild.Plugin = {
 const options = {
   entryPoints: ["src/index.ts"],
   bundle: true,
-  platform: "neutral",
+  platform: "node",
   target: "es2020",
   outfile: "dist/bundle.js",
   format: "esm",
   logLevel: "info",
   plugins: [] as esbuild.Plugin[],
+  external: ["@ironclad/rivet-core"],
 } satisfies esbuild.BuildOptions;
 
 if (process.argv.includes("--sync")) {

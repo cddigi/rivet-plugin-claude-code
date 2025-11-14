@@ -63,8 +63,10 @@ export async function executeClaude(
     // Build CLI command
     const args: string[] = ["claude", "--print"];
 
-    // Add output format
-    args.push("--output-format", outputFormat);
+    // Use JSON format internally when session management is enabled to capture session ID
+    // We'll extract the text for the user if they requested text format
+    const internalFormat = options.enableResume ? "json" : outputFormat;
+    args.push("--output-format", internalFormat);
 
     // Add model if specified
     if (options.model) {
@@ -108,7 +110,8 @@ export async function executeClaude(
             `Invalid session ID format: ${sessionId}. Must be a valid UUID.`
           );
         }
-        args.push("--resume", sessionId);
+        // Use --session-id to specify the exact session ID
+        args.push("--session-id", sessionId);
       }
     }
 
@@ -165,15 +168,19 @@ export async function executeClaude(
       console.log("[Claude Code Plugin] stderr:", stderr);
     }
 
-    // Parse output based on format
+    // Parse output based on internal format used
     let response = "";
     let metadata: Record<string, any> = {};
     let extractedSessionId = "";
 
-    if (outputFormat === "json" || outputFormat === "stream-json") {
+    if (internalFormat === "json" || internalFormat === "stream-json") {
       try {
         const jsonOutput = JSON.parse(stdout);
-        response = jsonOutput.response || jsonOutput.content || stdout;
+
+        // Extract response text
+        response = jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
+
+        // Extract metadata
         metadata = {
           cost: jsonOutput.cost,
           duration: jsonOutput.duration,
@@ -181,8 +188,17 @@ export async function executeClaude(
           model: jsonOutput.model,
           ...jsonOutput.metadata,
         };
+
         extractedSessionId = jsonOutput.session_id || "";
+
+        // If user requested text format but we used JSON internally for session management,
+        // just return the text portion
+        if (outputFormat === "text") {
+          // Keep the response as text only, but preserve metadata for session ID
+          console.log("[Claude Code Plugin] Converted JSON to text for user, keeping session ID:", extractedSessionId);
+        }
       } catch (parseError) {
+        console.error("[Claude Code Plugin] JSON parsing failed:", parseError);
         // If JSON parsing fails, treat as text
         response = stdout;
       }

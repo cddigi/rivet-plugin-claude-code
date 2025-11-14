@@ -41,6 +41,7 @@ export async function executeClaude(
   options: ClaudeExecutionOptions
 ): Promise<ClaudeExecutionResult> {
   try {
+    console.log("[Claude Code Plugin] Starting execution...");
     const { prompt, outputFormat, sessionId, mcpConfig } = options;
 
     // Validate required fields
@@ -49,8 +50,10 @@ export async function executeClaude(
     }
 
     // Check if claude CLI is available
+    console.log("[Claude Code Plugin] Checking for Claude CLI...");
     try {
       await execAsync("claude --version");
+      console.log("[Claude Code Plugin] Claude CLI found");
     } catch (error) {
       throw new Error(
         "Claude CLI not found. Please install Claude Code CLI. Visit https://code.claude.com for installation instructions."
@@ -149,9 +152,19 @@ export async function executeClaude(
 
     // Execute the command
     const command = args.join(" ");
+    console.log("[Claude Code Plugin] Executing command:", command);
+
+    // Add timeout and proper stdio configuration
     const { stdout, stderr } = await execAsync(command, {
       maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large responses
+      timeout: 300000, // 5 minute timeout
+      env: { ...process.env, CI: "true" }, // Set CI env to prevent interactive prompts
     });
+
+    console.log("[Claude Code Plugin] Command completed");
+    if (stderr) {
+      console.log("[Claude Code Plugin] stderr:", stderr);
+    }
 
     // Parse output based on format
     let response = "";

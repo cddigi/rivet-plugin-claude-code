@@ -358,6 +358,8 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
       _context: InternalProcessContext
     ): Promise<Outputs> {
       try {
+        console.log("[Claude Code Node] Process started");
+
         // Extract input values
         const prompt = rivet.getInputOrData(
           data,
@@ -365,6 +367,8 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
           "prompt",
           "string"
         );
+
+        console.log("[Claude Code Node] Prompt:", prompt);
 
         const systemPrompt = data.useSystemPromptInput
           ? rivet.getInputOrData(data, inputData, "systemPrompt", "string")
@@ -379,9 +383,11 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
           : data.mcpConfig;
 
         // Dynamically import the Node.js implementation
+        console.log("[Claude Code Node] Attempting dynamic import...");
         const { executeClaude } = await import(
           "./ClaudeCodeHeadlessNode.node.js"
         );
+        console.log("[Claude Code Node] Dynamic import successful");
 
         // Build execution options
         const options: ClaudeExecutionOptions = {
@@ -403,7 +409,9 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
         };
 
         // Execute Claude CLI
+        console.log("[Claude Code Node] Calling executeClaude...");
         const result = await executeClaude(options);
+        console.log("[Claude Code Node] executeClaude returned:", result.success);
 
         return {
           ["response" as PortId]: {
@@ -428,6 +436,7 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
           },
         };
       } catch (error: any) {
+        console.error("[Claude Code Node] Error:", error);
         return {
           ["response" as PortId]: {
             type: "string",

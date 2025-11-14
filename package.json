@@ -1,8 +1,9 @@
 {
-  "name": "rivet-plugin-example",
+  "name": "rivet-plugin-claude-code",
   "packageManager": "yarn@3.5.0",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Rivet plugin for Claude Code headless mode integration",
   "main": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -15,11 +16,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -b && tsx bundle.ts",
+    "build": "NODE_NO_WARNINGS=1 tsc -b && NODE_NO_WARNINGS=1 tsx bundle.ts",
     "dev": "run-p watch:tsc watch:esbuild:sync",
     "watch:tsc": "tsc -b -w --preserveWatchOutput",
-    "watch:esbuild": "tsx bundle.ts --watch",
-    "watch:esbuild:sync": "tsx bundle.ts --watch --sync",
+    "watch:esbuild": "NODE_NO_WARNINGS=1 tsx bundle.ts --watch",
+    "watch:esbuild:sync": "NODE_NO_WARNINGS=1 tsx bundle.ts --watch --sync",
     "publish": "yarn build && yarn npm publish --access public"
   },
   "dependencies": {
@@ -37,5 +38,19 @@
   },
   "rivet": {
     "skipInstall": true
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lawls/rivet-plugin-claude-code.git"
+  },
+  "keywords": [
+    "rivet",
+    "plugin",
+    "claude",
+    "ai",
+    "anthropic",
+    "headless"
+  ],
+  "author": "lawls",
+  "license": "MIT"
 }

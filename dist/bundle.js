@@ -1,7 +1,4 @@
 // src/nodes/ClaudeCodeHeadlessNode.ts
-import { exec } from "child_process";
-import { promisify } from "util";
-var execAsync = promisify(exec);
 function claudeCodeHeadlessNode(rivet) {
   const ClaudeCodeHeadlessNodeImpl = {
     create() {
@@ -225,121 +222,45 @@ function claudeCodeHeadlessNode(rivet) {
         const systemPrompt = data.useSystemPromptInput ? rivet.getInputOrData(data, inputData, "systemPrompt", "string") : data.systemPrompt;
         const sessionId = data.useSessionIdInput ? rivet.getInputOrData(data, inputData, "sessionId", "string") : data.sessionId;
         const mcpConfig = data.useMcpConfigInput ? rivet.getInputOrData(data, inputData, "mcpConfig", "string") : data.mcpConfig;
-        if (!prompt || prompt.trim() === "") {
-          throw new Error("Prompt is required");
-        }
-        try {
-          await execAsync("claude --version");
-        } catch (error) {
-          throw new Error(
-            "Claude CLI not found. Please install Claude Code CLI. Visit https://code.claude.com for installation instructions."
-          );
-        }
-        const args = ["claude", "--print"];
-        args.push("--output-format", data.outputFormat);
-        if (data.model) {
-          args.push("--model", data.model);
-        }
-        if (systemPrompt) {
-          args.push("--system-prompt", `"${systemPrompt.replace(/"/g, '\\"')}"`);
-        }
-        if (data.appendSystemPrompt) {
-          args.push(
-            "--append-system-prompt",
-            `"${data.appendSystemPrompt.replace(/"/g, '\\"')}"`
-          );
-        }
-        if (data.allowedTools) {
-          args.push("--allowedTools", data.allowedTools);
-        }
-        if (data.disallowedTools) {
-          args.push("--disallowedTools", data.disallowedTools);
-        }
-        if (data.enableResume) {
-          if (data.continueLastSession) {
-            args.push("--continue");
-          } else if (sessionId) {
-            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            if (!uuidRegex.test(sessionId)) {
-              throw new Error(
-                `Invalid session ID format: ${sessionId}. Must be a valid UUID.`
-              );
-            }
-            args.push("--resume", sessionId);
-          }
-        }
-        if (mcpConfig) {
-          args.push("--mcp-config", `"${mcpConfig.replace(/"/g, '\\"')}"`);
-        }
-        if (data.permissionMode && data.permissionMode !== "default") {
-          const modeMap = {
-            acceptEdits: "--accept-edits",
-            bypassPermissions: "--dangerously-skip-permissions",
-            plan: "--plan"
-          };
-          args.push(modeMap[data.permissionMode]);
-        }
-        if (data.verbose) {
-          args.push("--verbose");
-        }
-        if (data.fallbackModel) {
-          args.push("--fallback-model", data.fallbackModel);
-        }
-        if (data.additionalDirs) {
-          const dirs = data.additionalDirs.split(",").map((d) => d.trim());
-          for (const dir of dirs) {
-            if (dir) {
-              args.push("--add-dir", `"${dir.replace(/"/g, '\\"')}"`);
-            }
-          }
-        }
-        args.push(`"${prompt.replace(/"/g, '\\"')}"`);
-        const command = args.join(" ");
-        const { stdout, stderr } = await execAsync(command, {
-          maxBuffer: 10 * 1024 * 1024
-          // 10MB buffer for large responses
-        });
-        let response = "";
-        let metadata = {};
-        let extractedSessionId = "";
-        if (data.outputFormat === "json" || data.outputFormat === "stream-json") {
-          try {
-            const jsonOutput = JSON.parse(stdout);
-            response = jsonOutput.response || jsonOutput.content || stdout;
-            metadata = {
-              cost: jsonOutput.cost,
-              duration: jsonOutput.duration,
-              session_id: jsonOutput.session_id,
-              model: jsonOutput.model,
-              ...jsonOutput.metadata
-            };
-            extractedSessionId = jsonOutput.session_id || "";
-          } catch (parseError) {
-            response = stdout;
-          }
-        } else {
-          response = stdout;
-        }
+        const { executeClaude } = await import("./ClaudeCodeHeadlessNode.node.js");
+        const options = {
+          prompt,
+          outputFormat: data.outputFormat,
+          model: data.model,
+          systemPrompt,
+          appendSystemPrompt: data.appendSystemPrompt,
+          allowedTools: data.allowedTools,
+          disallowedTools: data.disallowedTools,
+          enableResume: data.enableResume,
+          sessionId,
+          continueLastSession: data.continueLastSession,
+          mcpConfig,
+          permissionMode: data.permissionMode,
+          verbose: data.verbose,
+          fallbackModel: data.fallbackModel,
+          additionalDirs: data.additionalDirs
+        };
+        const result = await executeClaude(options);
         return {
           ["response"]: {
             type: "string",
-            value: response
+            value: result.response
           },
           ["metadata"]: {
             type: "object",
-            value: metadata
+            value: result.metadata
           },
           ["success"]: {
             type: "boolean",
-            value: true
+            value: result.success
           },
           ["error"]: {
             type: "string",
-            value: ""
+            value: result.error
           },
           ["sessionId"]: {
             type: "string",
-            value: extractedSessionId || sessionId || ""
+            value: result.sessionId
           }
         };
       } catch (error) {

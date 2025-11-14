@@ -16,11 +16,11 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -b && tsx bundle.ts",
+    "build": "NODE_NO_WARNINGS=1 tsc -b && NODE_NO_WARNINGS=1 tsx bundle.ts",
     "dev": "run-p watch:tsc watch:esbuild:sync",
     "watch:tsc": "tsc -b -w --preserveWatchOutput",
-    "watch:esbuild": "tsx bundle.ts --watch",
-    "watch:esbuild:sync": "tsx bundle.ts --watch --sync",
+    "watch:esbuild": "NODE_NO_WARNINGS=1 tsx bundle.ts --watch",
+    "watch:esbuild:sync": "NODE_NO_WARNINGS=1 tsx bundle.ts --watch --sync",
     "publish": "yarn build && yarn npm publish --access public"
   },
   "dependencies": {

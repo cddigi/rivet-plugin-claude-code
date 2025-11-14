@@ -5,8 +5,21 @@ import copy from "recursive-copy";
 import { platform, homedir } from "node:os";
 import { readFile, rm, mkdir, copyFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { builtinModules } from "node:module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Plugin to mark Node.js built-in modules as external
+const nodeBuiltinsPlugin: esbuild.Plugin = {
+  name: "node-builtins",
+  setup(build) {
+    const filter = new RegExp(`^(${builtinModules.join("|")})$`);
+    build.onResolve({ filter }, (args) => ({
+      path: args.path,
+      external: true,
+    }));
+  },
+};
 
 // Roughly https://github.com/demurgos/appdata-path/blob/master/lib/index.js but appdata local and .local/share, try to match `dirs` from rust
 function getAppDataLocalPath() {
@@ -69,28 +82,47 @@ const syncPlugin: esbuild.Plugin = {
   },
 };
 
-const options = {
+// Isomorphic bundle - works in browser and Node.js
+const isomorphicOptions = {
   entryPoints: ["src/index.ts"],
   bundle: true,
-  platform: "node",
+  platform: "neutral",
   target: "es2020",
   outfile: "dist/bundle.js",
   format: "esm",
   logLevel: "info",
   plugins: [] as esbuild.Plugin[],
-  external: ["@ironclad/rivet-core", "child_process", "util"],
+  external: ["@ironclad/rivet-core", "./ClaudeCodeHeadlessNode.node.js"],
+} satisfies esbuild.BuildOptions;
+
+// Node.js-only bundle - contains Node.js-specific implementations
+const nodeOptions = {
+  entryPoints: ["src/nodes/ClaudeCodeHeadlessNode.node.ts"],
+  bundle: true,
+  platform: "node",
+  target: "es2020",
+  outfile: "dist/ClaudeCodeHeadlessNode.node.js",
+  format: "esm",
+  logLevel: "info",
+  plugins: [nodeBuiltinsPlugin],
 } satisfies esbuild.BuildOptions;
 
 if (process.argv.includes("--sync")) {
-  options.plugins.push(syncPlugin);
+  isomorphicOptions.plugins.push(syncPlugin);
 }
 
 if (process.argv.includes("--watch")) {
-  const context = await esbuild.context(options);
+  const isomorphicContext = await esbuild.context(isomorphicOptions);
+  const nodeContext = await esbuild.context(nodeOptions);
 
-  await context.watch();
+  await isomorphicContext.watch();
+  await nodeContext.watch();
 
   console.log("Watching for changes...");
 } else {
-  await esbuild.build(options);
+  await esbuild.build(isomorphicOptions);
+  await esbuild.build(nodeOptions);
+
+  console.log("Built isomorphic bundle: dist/bundle.js");
+  console.log("Built Node.js bundle: dist/ClaudeCodeHeadlessNode.node.js");
 }

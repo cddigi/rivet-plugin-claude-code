@@ -19,10 +19,12 @@ import type {
   Project,
   Rivet,
 } from "@ironclad/rivet-core";
-import { exec } from "child_process";
-import { promisify } from "util";
 
-const execAsync = promisify(exec);
+// Import types only from the Node.js implementation
+import type {
+  ClaudeExecutionOptions,
+  ClaudeExecutionResult,
+} from "./ClaudeCodeHeadlessNode.node.js";
 
 /**
  * Claude Code Headless Node
@@ -376,158 +378,53 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
           ? rivet.getInputOrData(data, inputData, "mcpConfig", "string")
           : data.mcpConfig;
 
-        // Validate required fields
-        if (!prompt || prompt.trim() === "") {
-          throw new Error("Prompt is required");
-        }
+        // Dynamically import the Node.js implementation
+        const { executeClaude } = await import(
+          "./ClaudeCodeHeadlessNode.node.js"
+        );
 
-        // Check if claude CLI is available
-        try {
-          await execAsync("claude --version");
-        } catch (error) {
-          throw new Error(
-            "Claude CLI not found. Please install Claude Code CLI. Visit https://code.claude.com for installation instructions."
-          );
-        }
+        // Build execution options
+        const options: ClaudeExecutionOptions = {
+          prompt,
+          outputFormat: data.outputFormat,
+          model: data.model,
+          systemPrompt,
+          appendSystemPrompt: data.appendSystemPrompt,
+          allowedTools: data.allowedTools,
+          disallowedTools: data.disallowedTools,
+          enableResume: data.enableResume,
+          sessionId,
+          continueLastSession: data.continueLastSession,
+          mcpConfig,
+          permissionMode: data.permissionMode,
+          verbose: data.verbose,
+          fallbackModel: data.fallbackModel,
+          additionalDirs: data.additionalDirs,
+        };
 
-        // Build CLI command
-        const args: string[] = ["claude", "--print"];
-
-        // Add output format
-        args.push("--output-format", data.outputFormat);
-
-        // Add model if specified
-        if (data.model) {
-          args.push("--model", data.model);
-        }
-
-        // Add system prompt options
-        if (systemPrompt) {
-          args.push("--system-prompt", `"${systemPrompt.replace(/"/g, '\\"')}"`);
-        }
-
-        if (data.appendSystemPrompt) {
-          args.push(
-            "--append-system-prompt",
-            `"${data.appendSystemPrompt.replace(/"/g, '\\"')}"`
-          );
-        }
-
-        // Add tool controls
-        if (data.allowedTools) {
-          args.push("--allowedTools", data.allowedTools);
-        }
-
-        if (data.disallowedTools) {
-          args.push("--disallowedTools", data.disallowedTools);
-        }
-
-        // Add session management
-        if (data.enableResume) {
-          if (data.continueLastSession) {
-            args.push("--continue");
-          } else if (sessionId) {
-            // Validate UUID format
-            const uuidRegex =
-              /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-            if (!uuidRegex.test(sessionId)) {
-              throw new Error(
-                `Invalid session ID format: ${sessionId}. Must be a valid UUID.`
-              );
-            }
-            args.push("--resume", sessionId);
-          }
-        }
-
-        // Add MCP config
-        if (mcpConfig) {
-          args.push("--mcp-config", `"${mcpConfig.replace(/"/g, '\\"')}"`);
-        }
-
-        // Add permission mode
-        if (data.permissionMode && data.permissionMode !== "default") {
-          const modeMap = {
-            acceptEdits: "--accept-edits",
-            bypassPermissions: "--dangerously-skip-permissions",
-            plan: "--plan",
-          };
-          args.push(modeMap[data.permissionMode]);
-        }
-
-        // Add verbose flag
-        if (data.verbose) {
-          args.push("--verbose");
-        }
-
-        // Add fallback model
-        if (data.fallbackModel) {
-          args.push("--fallback-model", data.fallbackModel);
-        }
-
-        // Add additional directories
-        if (data.additionalDirs) {
-          const dirs = data.additionalDirs.split(",").map((d) => d.trim());
-          for (const dir of dirs) {
-            if (dir) {
-              args.push("--add-dir", `"${dir.replace(/"/g, '\\"')}"`);
-            }
-          }
-        }
-
-        // Add the prompt as the final argument
-        args.push(`"${prompt.replace(/"/g, '\\"')}"`);
-
-        // Execute the command
-        const command = args.join(" ");
-        const { stdout, stderr } = await execAsync(command, {
-          maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large responses
-        });
-
-        // Parse output based on format
-        let response = "";
-        let metadata: Record<string, any> = {};
-        let extractedSessionId = "";
-
-        if (data.outputFormat === "json" || data.outputFormat === "stream-json") {
-          try {
-            const jsonOutput = JSON.parse(stdout);
-            response = jsonOutput.response || jsonOutput.content || stdout;
-            metadata = {
-              cost: jsonOutput.cost,
-              duration: jsonOutput.duration,
-              session_id: jsonOutput.session_id,
-              model: jsonOutput.model,
-              ...jsonOutput.metadata,
-            };
-            extractedSessionId = jsonOutput.session_id || "";
-          } catch (parseError) {
-            // If JSON parsing fails, treat as text
-            response = stdout;
-          }
-        } else {
-          response = stdout;
-        }
+        // Execute Claude CLI
+        const result = await executeClaude(options);
 
         return {
           ["response" as PortId]: {
             type: "string",
-            value: response,
+            value: result.response,
           },
           ["metadata" as PortId]: {
             type: "object",
-            value: metadata,
+            value: result.metadata,
           },
           ["success" as PortId]: {
             type: "boolean",
-            value: true,
+            value: result.success,
           },
           ["error" as PortId]: {
             type: "string",
-            value: "",
+            value: result.error,
           },
           ["sessionId" as PortId]: {
             type: "string",
-            value: extractedSessionId || sessionId || "",
+            value: result.sessionId,
           },
         };
       } catch (error: any) {

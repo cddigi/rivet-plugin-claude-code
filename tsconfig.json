@@ -11,5 +11,5 @@
     "emitDeclarationOnly": true,
     "outDir": "dist",
   },
-  "exclude": ["dist", "bundle.ts"]
+  "exclude": ["dist", "bundle.ts", "**/*.node.ts"]
 }

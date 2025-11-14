@@ -211,6 +211,7 @@ export function claudeCodeHeadlessNode(rivet: typeof Rivet) {
         infoBoxBody:
           "Execute Claude Code in headless mode. Supports prompts, session management, tool control, and MCP integration.",
         infoBoxTitle: "Claude Code Headless Node",
+        infoBoxImageUri: "image.png",
       };
     },
 

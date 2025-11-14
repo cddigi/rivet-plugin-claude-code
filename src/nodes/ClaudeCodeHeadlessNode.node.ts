@@ -165,7 +165,6 @@ export async function executeClaude(
       maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large responses
       timeout: 300000, // 5 minute timeout
       env: { ...process.env, CI: "true" }, // Set CI env to prevent interactive prompts
-      shell: true,
     });
 
     console.log("[Claude Code Plugin] Command completed");

@@ -79,16 +79,17 @@ async function executeClaude(options) {
         }
       }
     }
-    args.push(`"${prompt.replace(/"/g, '\\"')}"`);
     const command = args.join(" ");
     console.log("[Claude Code Plugin] Executing command:", command);
-    const { stdout, stderr } = await execAsync(command, {
+    console.log("[Claude Code Plugin] With stdin:", prompt);
+    const { stdout, stderr } = await execAsync(`echo "${prompt.replace(/"/g, '\\"')}" | ${command}`, {
       maxBuffer: 10 * 1024 * 1024,
       // 10MB buffer for large responses
       timeout: 3e5,
       // 5 minute timeout
-      env: { ...process.env, CI: "true" }
+      env: { ...process.env, CI: "true" },
       // Set CI env to prevent interactive prompts
+      shell: true
     });
     console.log("[Claude Code Plugin] Command completed");
     if (stderr) {

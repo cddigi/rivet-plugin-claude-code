@@ -68,6 +68,11 @@ export async function executeClaude(
     const internalFormat = options.enableResume ? "json" : outputFormat;
     args.push("--output-format", internalFormat);
 
+    // stream-json requires --verbose when using --print
+    if (internalFormat === "stream-json" && !options.verbose) {
+      args.push("--verbose");
+    }
+
     // Add model if specified
     if (options.model) {
       args.push("--model", options.model);
@@ -173,7 +178,7 @@ export async function executeClaude(
     let metadata: Record<string, any> = {};
     let extractedSessionId = "";
 
-    if (internalFormat === "json" || internalFormat === "stream-json") {
+    if (internalFormat === "json") {
       try {
         const jsonOutput = JSON.parse(stdout);
 
@@ -201,6 +206,50 @@ export async function executeClaude(
       } catch (parseError) {
         console.error("[Claude Code Plugin] JSON parsing failed:", parseError);
         // If JSON parsing fails, treat as text
+        response = stdout;
+      }
+    } else if (internalFormat === "stream-json") {
+      try {
+        // stream-json is JSONL (newline-delimited JSON)
+        // Parse all lines and get the final result
+        const lines = stdout.trim().split("\n");
+        let finalResult = null;
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const jsonLine = JSON.parse(line);
+              // The last line with type "result" contains the final output
+              if (jsonLine.type === "result") {
+                finalResult = jsonLine;
+              }
+            } catch (lineError) {
+              console.error("[Claude Code Plugin] Failed to parse JSONL line:", line);
+            }
+          }
+        }
+
+        if (finalResult) {
+          // Extract response text
+          response = finalResult.result || finalResult.response || finalResult.content || finalResult.text || stdout;
+
+          // Extract metadata
+          metadata = {
+            cost: finalResult.total_cost_usd,
+            duration: finalResult.duration_ms,
+            session_id: finalResult.session_id,
+            model: finalResult.model,
+            usage: finalResult.usage,
+            modelUsage: finalResult.modelUsage,
+          };
+
+          extractedSessionId = finalResult.session_id || "";
+        } else {
+          console.warn("[Claude Code Plugin] No result found in stream-json output");
+          response = stdout;
+        }
+      } catch (parseError) {
+        console.error("[Claude Code Plugin] stream-json parsing failed:", parseError);
         response = stdout;
       }
     } else {

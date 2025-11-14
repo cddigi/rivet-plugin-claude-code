@@ -182,9 +182,6 @@ export async function executeClaude(
       try {
         const jsonOutput = JSON.parse(stdout);
 
-        // Extract response text - Claude CLI uses 'result' field
-        response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
-
         // Extract metadata
         metadata = {
           cost: jsonOutput.total_cost_usd,
@@ -198,10 +195,13 @@ export async function executeClaude(
         extractedSessionId = jsonOutput.session_id || "";
 
         // If user requested text format but we used JSON internally for session management,
-        // just return the text portion
+        // extract just the text portion
         if (outputFormat === "text") {
-          // Keep the response as text only, but preserve metadata for session ID
+          response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
           console.log("[Claude Code Plugin] Converted JSON to text for user, keeping session ID:", extractedSessionId);
+        } else {
+          // User wants JSON format - return the full JSON object as a string
+          response = JSON.stringify(jsonOutput, null, 2);
         }
       } catch (parseError) {
         console.error("[Claude Code Plugin] JSON parsing failed:", parseError);
@@ -230,9 +230,6 @@ export async function executeClaude(
         }
 
         if (finalResult) {
-          // Extract response text
-          response = finalResult.result || finalResult.response || finalResult.content || finalResult.text || stdout;
-
           // Extract metadata
           metadata = {
             cost: finalResult.total_cost_usd,
@@ -244,6 +241,15 @@ export async function executeClaude(
           };
 
           extractedSessionId = finalResult.session_id || "";
+
+          // If user requested text format but we used stream-json internally,
+          // extract just the text portion (though this shouldn't happen normally)
+          if (outputFormat === "text") {
+            response = finalResult.result || finalResult.response || finalResult.content || finalResult.text || stdout;
+          } else {
+            // User wants stream-json format - return the full JSONL output
+            response = stdout;
+          }
         } else {
           console.warn("[Claude Code Plugin] No result found in stream-json output");
           response = stdout;

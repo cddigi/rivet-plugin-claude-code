@@ -147,18 +147,17 @@ export async function executeClaude(
       }
     }
 
-    // Add the prompt as the final argument
-    args.push(`"${prompt.replace(/"/g, '\\"')}"`);
-
-    // Execute the command
+    // Don't add prompt as argument - we'll pipe it via stdin
     const command = args.join(" ");
     console.log("[Claude Code Plugin] Executing command:", command);
+    console.log("[Claude Code Plugin] With stdin:", prompt);
 
-    // Add timeout and proper stdio configuration
-    const { stdout, stderr } = await execAsync(command, {
+    // Execute the command with prompt piped via stdin
+    const { stdout, stderr } = await execAsync(`echo "${prompt.replace(/"/g, '\\"')}" | ${command}`, {
       maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large responses
       timeout: 300000, // 5 minute timeout
       env: { ...process.env, CI: "true" }, // Set CI env to prevent interactive prompts
+      shell: true,
     });
 
     console.log("[Claude Code Plugin] Command completed");

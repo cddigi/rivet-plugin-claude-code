@@ -105,7 +105,6 @@ async function executeClaude(options) {
     if (internalFormat === "json") {
       try {
         const jsonOutput = JSON.parse(stdout);
-        response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
         metadata = {
           cost: jsonOutput.total_cost_usd,
           duration: jsonOutput.duration_ms,
@@ -116,7 +115,10 @@ async function executeClaude(options) {
         };
         extractedSessionId = jsonOutput.session_id || "";
         if (outputFormat === "text") {
+          response = jsonOutput.result || jsonOutput.response || jsonOutput.content || jsonOutput.text || stdout;
           console.log("[Claude Code Plugin] Converted JSON to text for user, keeping session ID:", extractedSessionId);
+        } else {
+          response = JSON.stringify(jsonOutput, null, 2);
         }
       } catch (parseError) {
         console.error("[Claude Code Plugin] JSON parsing failed:", parseError);
@@ -139,7 +141,6 @@ async function executeClaude(options) {
           }
         }
         if (finalResult) {
-          response = finalResult.result || finalResult.response || finalResult.content || finalResult.text || stdout;
           metadata = {
             cost: finalResult.total_cost_usd,
             duration: finalResult.duration_ms,
@@ -149,6 +150,11 @@ async function executeClaude(options) {
             modelUsage: finalResult.modelUsage
           };
           extractedSessionId = finalResult.session_id || "";
+          if (outputFormat === "text") {
+            response = finalResult.result || finalResult.response || finalResult.content || finalResult.text || stdout;
+          } else {
+            response = stdout;
+          }
         } else {
           console.warn("[Claude Code Plugin] No result found in stream-json output");
           response = stdout;

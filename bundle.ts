@@ -78,7 +78,7 @@ const options = {
   format: "esm",
   logLevel: "info",
   plugins: [] as esbuild.Plugin[],
-  external: ["@ironclad/rivet-core"],
+  external: ["@ironclad/rivet-core", "child_process", "util"],
 } satisfies esbuild.BuildOptions;
 
 if (process.argv.includes("--sync")) {

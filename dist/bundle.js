@@ -213,16 +213,20 @@ function claudeCodeHeadlessNode(rivet) {
     },
     async process(data, inputData, _context) {
       try {
+        console.log("[Claude Code Node] Process started");
         const prompt = rivet.getInputOrData(
           data,
           inputData,
           "prompt",
           "string"
         );
+        console.log("[Claude Code Node] Prompt:", prompt);
         const systemPrompt = data.useSystemPromptInput ? rivet.getInputOrData(data, inputData, "systemPrompt", "string") : data.systemPrompt;
         const sessionId = data.useSessionIdInput ? rivet.getInputOrData(data, inputData, "sessionId", "string") : data.sessionId;
         const mcpConfig = data.useMcpConfigInput ? rivet.getInputOrData(data, inputData, "mcpConfig", "string") : data.mcpConfig;
+        console.log("[Claude Code Node] Attempting dynamic import...");
         const { executeClaude } = await import("./ClaudeCodeHeadlessNode.node.js");
+        console.log("[Claude Code Node] Dynamic import successful");
         const options = {
           prompt,
           outputFormat: data.outputFormat,
@@ -240,7 +244,9 @@ function claudeCodeHeadlessNode(rivet) {
           fallbackModel: data.fallbackModel,
           additionalDirs: data.additionalDirs
         };
+        console.log("[Claude Code Node] Calling executeClaude...");
         const result = await executeClaude(options);
+        console.log("[Claude Code Node] executeClaude returned:", result.success);
         return {
           ["response"]: {
             type: "string",
@@ -264,6 +270,7 @@ function claudeCodeHeadlessNode(rivet) {
           }
         };
       } catch (error) {
+        console.error("[Claude Code Node] Error:", error);
         return {
           ["response"]: {
             type: "string",

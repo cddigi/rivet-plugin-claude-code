@@ -93,9 +93,6 @@ const isomorphicOptions = {
   logLevel: "info",
   plugins: [] as esbuild.Plugin[],
   external: ["@ironclad/rivet-core", "./ClaudeCodeHeadlessNode.node.js"],
-  loader: {
-    ".png": "dataurl",
-  },
 } satisfies esbuild.BuildOptions;
 
 // Node.js-only bundle - contains Node.js-specific implementations

@@ -2,6 +2,8 @@
 
 # Rivet Claude Code Plugin
 
+![Claude Code Headless Node](image.png)
+
 A [Rivet](https://github.com/Ironclad/rivet) plugin that integrates Claude Code's headless mode, enabling programmatic execution of Claude within Rivet workflows.
 
 - [Features](#features)

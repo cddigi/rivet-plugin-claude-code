@@ -41,9 +41,9 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - `fallbackModel?: string` - Fallback model when default is overloaded
 
 ### Success Criteria:
-- [ ] Type definitions compile without errors
-- [ ] All data fields are properly typed
-- [ ] Follows pattern from ExamplePluginNode.ts
+- [x] Type definitions compile without errors
+- [x] All data fields are properly typed
+- [x] Follows pattern from ExamplePluginNode.ts
 
 ### Documentation References:
 - CLI flags from `claude --help` output
@@ -86,10 +86,10 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - String editor for fallbackModel
 
 ### Success Criteria:
-- [ ] Node can be created and appears in Rivet UI
-- [ ] All editors are accessible and functional
-- [ ] Node body displays current configuration clearly
-- [ ] UI follows Rivet conventions
+- [x] Node can be created and appears in Rivet UI
+- [x] All editors are accessible and functional
+- [x] Node body displays current configuration clearly
+- [x] UI follows Rivet conventions
 
 ### Documentation References:
 - ExamplePluginNode.ts lines 44-141 for implementation patterns
@@ -116,9 +116,9 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Output port `sessionId` (string) - The session ID used/created
 
 ### Success Criteria:
-- [ ] Input ports appear/disappear based on toggle states
-- [ ] All output ports are properly typed
-- [ ] Port IDs are unique and consistent
+- [x] Input ports appear/disappear based on toggle states
+- [x] All output ports are properly typed
+- [x] Port IDs are unique and consistent
 
 ### Documentation References:
 - ExamplePluginNode.ts lines 72-106 for port definition patterns
@@ -161,11 +161,11 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Include session ID if available
 
 ### Success Criteria:
-- [ ] Can execute basic Claude CLI command with prompt
-- [ ] Text output format works correctly
-- [ ] JSON output format works and is parsed
-- [ ] Error handling captures CLI errors
-- [ ] Exit codes are properly handled
+- [x] Can execute basic Claude CLI command with prompt
+- [x] Text output format works correctly
+- [x] JSON output format works and is parsed
+- [x] Error handling captures CLI errors
+- [x] Exit codes are properly handled
 
 ### Tests:
 - Basic text prompt execution
@@ -201,10 +201,10 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Already implemented in Stage 4, validate it works
 
 ### Success Criteria:
-- [ ] allowedTools/disallowedTools properly filter available tools
-- [ ] fallbackModel is used when specified
-- [ ] permissionMode changes Claude's behavior appropriately
-- [ ] All flags are properly formatted in CLI command
+- [x] allowedTools/disallowedTools properly filter available tools
+- [x] fallbackModel is used when specified
+- [x] permissionMode changes Claude's behavior appropriately
+- [x] All flags are properly formatted in CLI command
 
 ### Tests:
 - Execution with allowedTools="Bash,Read"
@@ -241,11 +241,11 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Not implemented in Stage 6, but noted for future
 
 ### Success Criteria:
-- [ ] Can resume a previous session by ID
-- [ ] Can continue most recent session
-- [ ] Session ID is extracted and returned
-- [ ] Session ID validation works
-- [ ] Multi-turn conversations maintain context
+- [x] Can resume a previous session by ID
+- [x] Can continue most recent session
+- [x] Session ID is extracted and returned
+- [x] Session ID validation works
+- [x] Multi-turn conversations maintain context
 
 ### Tests:
 - Execute initial prompt, capture session ID
@@ -285,11 +285,11 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Add to CLI command builder
 
 ### Success Criteria:
-- [ ] MCP config file path works
-- [ ] MCP config JSON string works
-- [ ] System prompts customize behavior
-- [ ] append-system-prompt extends default prompt
-- [ ] Error handling for invalid MCP configs
+- [x] MCP config file path works
+- [x] MCP config JSON string works
+- [x] System prompts customize behavior
+- [x] append-system-prompt extends default prompt
+- [x] Error handling for invalid MCP configs
 
 ### Tests:
 - Execution with MCP config file
@@ -371,11 +371,11 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Suggest fixes for common errors
 
 ### Success Criteria:
-- [ ] Clear error when claude CLI not found
-- [ ] Validation errors before execution
-- [ ] CLI errors are captured and reported
-- [ ] All error outputs use the error port
-- [ ] Error messages are actionable
+- [x] Clear error when claude CLI not found
+- [x] Validation errors before execution
+- [x] CLI errors are captured and reported
+- [x] All error outputs use the error port
+- [x] Error messages are actionable
 
 ### Tests:
 - Error when claude not in PATH
@@ -464,10 +464,10 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Assign node to this group
 
 ### Success Criteria:
-- [ ] Plugin registers successfully
-- [ ] Node appears in Rivet context menu under correct group
-- [ ] Plugin metadata is accurate
-- [ ] No import/bundle errors
+- [x] Plugin registers successfully
+- [x] Node appears in Rivet context menu under correct group
+- [x] Plugin metadata is accurate
+- [x] No import/bundle errors
 
 ### Tests:
 - Plugin loads in Rivet
@@ -483,7 +483,7 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Stage 12: Documentation and Examples
 **Goal**: Create comprehensive documentation for the plugin
-**Status**: Not Started
+**Status**: Partially Complete
 
 ### Tasks:
 1. Update README.md:
@@ -514,10 +514,10 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Match project requirements
 
 ### Success Criteria:
-- [ ] README is clear and comprehensive
-- [ ] Examples are tested and work
-- [ ] Code is well-documented
-- [ ] CHANGELOG is accurate
+- [x] README is clear and comprehensive
+- [x] Examples are tested and work
+- [x] Code is well-documented
+- [ ] CHANGELOG is accurate (MISSING - not created yet)
 
 ### Documentation References:
 - Example plugin READMEs for structure
@@ -554,10 +554,10 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
    - Prepare release notes
 
 ### Success Criteria:
-- [ ] Build completes without errors
-- [ ] Bundle works in Rivet
-- [ ] Package structure is correct
-- [ ] Ready for distribution
+- [x] Build completes without errors
+- [x] Bundle works in Rivet
+- [x] Package structure is correct
+- [x] Ready for distribution
 
 ### Tests:
 - Build process
@@ -612,11 +612,16 @@ Implement a Rivet plugin node that integrates Claude Code's headless mode, enabl
 
 ## Definition of Done
 
-- [ ] All stages marked as Complete
-- [ ] All tests passing
-- [ ] Build succeeds without warnings
-- [ ] Documentation complete
-- [ ] Manual testing successful
-- [ ] Plugin works in production Rivet application
-- [ ] Code follows project conventions
-- [ ] GitButler has recorded all changes with proper context
+- [x] All stages marked as Complete (except Stage 8 which is optional, and Stage 10/12 which have known gaps)
+- [ ] All tests passing (Stage 10 - NO TESTS EXIST YET)
+- [x] Build succeeds without warnings
+- [x] Documentation complete (except CHANGELOG.md in Stage 12)
+- [x] Manual testing successful
+- [x] Plugin works in production Rivet application
+- [x] Code follows project conventions
+- [x] GitButler has recorded all changes with proper context
+
+### Remaining Gaps:
+1. **Stage 10 (Testing)**: No test files have been created - tests are missing entirely
+2. **Stage 12 (Documentation)**: CHANGELOG.md has not been created
+3. **Stage 8 (Streaming)**: Marked as optional/future enhancement - not implemented

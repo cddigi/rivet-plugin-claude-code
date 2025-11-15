@@ -81,54 +81,54 @@ The Claude Code Headless node executes Claude Code in headless mode and returns 
 
 #### Basic Configuration
 
-| Option | Type | Description | Default |
-|--------|------|-------------|---------|
-| **Prompt** | string | The prompt/query to send to Claude | "Hello, Claude!" |
-| **Output Format** | dropdown | Response format: `text`, `json`, or `stream-json` | `text` |
-| **Model** | string | Model override (sonnet/opus/haiku or full model name) | _(empty)_ |
+| Option            | Type     | Description                                           | Default          |
+| ----------------- | -------- | ----------------------------------------------------- | ---------------- |
+| **Prompt**        | string   | The prompt/query to send to Claude                    | "Hello, Claude!" |
+| **Output Format** | dropdown | Response format: `text`, `json`, or `stream-json`     | `text`           |
+| **Model**         | string   | Model override (sonnet/opus/haiku or full model name) | _(empty)_        |
 
 #### System Prompts
 
-| Option | Type | Description |
-|--------|------|-------------|
-| **System Prompt** | string | Override the default system prompt completely |
+| Option                   | Type   | Description                                            |
+| ------------------------ | ------ | ------------------------------------------------------ |
+| **System Prompt**        | string | Override the default system prompt completely          |
 | **Append System Prompt** | string | Additional text to append to the default system prompt |
 
 #### Tool Control
 
-| Option | Type | Description |
-|--------|------|-------------|
-| **Allowed Tools** | string | Comma-separated list of tools Claude can use (e.g., "Bash,Read,Write") |
+| Option               | Type   | Description                                                                  |
+| -------------------- | ------ | ---------------------------------------------------------------------------- |
+| **Allowed Tools**    | string | Comma-separated list of tools Claude can use (e.g., "Bash,Read,Write")       |
 | **Disallowed Tools** | string | Comma-separated list of tools Claude cannot use (e.g., "WebFetch,WebSearch") |
 
 #### Session Management
 
-| Option | Type | Description |
-|--------|------|-------------|
-| **Enable Session Management** | toggle | Enable session resume/continue functionality |
-| **Session ID** | string | UUID of a previous session to resume (requires Enable Session Management) |
-| **Continue Last Session** | toggle | Continue the most recent conversation (requires Enable Session Management) |
+| Option                        | Type   | Description                                                                |
+| ----------------------------- | ------ | -------------------------------------------------------------------------- |
+| **Enable Session Management** | toggle | Enable session resume/continue functionality                               |
+| **Session ID**                | string | UUID of a previous session to resume (requires Enable Session Management)  |
+| **Continue Last Session**     | toggle | Continue the most recent conversation (requires Enable Session Management) |
 
 #### Advanced Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| **MCP Config** | string | Path to MCP config file or JSON string |
-| **Permission Mode** | dropdown | `default`, `acceptEdits`, `bypassPermissions`, or `plan` |
-| **Verbose Logging** | toggle | Enable verbose output for debugging |
-| **Fallback Model** | string | Model to use if default is overloaded |
-| **Additional Directories** | string | Comma-separated paths to include in context |
+| Option                     | Type     | Description                                              |
+| -------------------------- | -------- | -------------------------------------------------------- |
+| **MCP Config**             | string   | Path to MCP config file or JSON string                   |
+| **Permission Mode**        | dropdown | `default`, `acceptEdits`, `bypassPermissions`, or `plan` |
+| **Verbose Logging**        | toggle   | Enable verbose output for debugging                      |
+| **Fallback Model**         | string   | Model to use if default is overloaded                    |
+| **Additional Directories** | string   | Comma-separated paths to include in context              |
 
 ### Input Ports
 
 All input ports are **conditional** and only appear when their corresponding "use input" toggle is enabled in the node editor. This allows you to connect dynamic values from other nodes in your graph.
 
-| Port | Type | Toggle Setting | Description |
-|------|------|----------------|-------------|
-| **Prompt** | string | `usePromptInput` | Dynamic prompt input. Overrides the static prompt field when connected. |
+| Port              | Type   | Toggle Setting         | Description                                                                     |
+| ----------------- | ------ | ---------------------- | ------------------------------------------------------------------------------- |
+| **Prompt**        | string | `usePromptInput`       | Dynamic prompt input. Overrides the static prompt field when connected.         |
 | **System Prompt** | string | `useSystemPromptInput` | Dynamic system prompt. Overrides the static system prompt field when connected. |
-| **Session ID** | string | `useSessionIdInput` | Dynamic session ID for resuming conversations. Must be a valid UUID. |
-| **MCP Config** | string | `useMcpConfigInput` | Dynamic MCP configuration. Can be a file path or JSON string. |
+| **Session ID**    | string | `useSessionIdInput`    | Dynamic session ID for resuming conversations. Must be a valid UUID.            |
+| **MCP Config**    | string | `useMcpConfigInput`    | Dynamic MCP configuration. Can be a file path or JSON string.                   |
 
 **Example:** To create a dynamic prompt from user input, enable the "Use Prompt Input" toggle and connect a Text node or user input to the Prompt port.
 
@@ -136,24 +136,26 @@ All input ports are **conditional** and only appear when their corresponding "us
 
 All output ports are **always available** and provide different aspects of the Claude execution result.
 
-| Port | Type | Always Present | Description | Example Value |
-|------|------|----------------|-------------|---------------|
-| **Response** | string | ✅ | The response from Claude. Format depends on Output Format setting. | Text: `"Hello! How can I help?"` <br> JSON: `{"type":"result","result":"..."}` <br> Stream-JSON: JSONL stream |
-| **Metadata** | object | ✅ | Execution metadata including cost, duration, and usage statistics. | `{"cost": 0.0063, "duration": 2257, "session_id": "...", "usage": {...}}` |
-| **Success** | boolean | ✅ | `true` if execution succeeded, `false` if an error occurred. | `true` or `false` |
-| **Error** | string | ✅ | Error message if execution failed. Empty string on success. | `""` (success) or `"Claude CLI not found..."` (error) |
-| **Session ID** | string | ✅ | UUID of the session. Populated when Session Management is enabled. | `"354f251b-b47f-4552-b01d-74ccd2533ded"` |
+| Port           | Type    | Always Present | Description                                                        | Example Value                                                                                                 |
+| -------------- | ------- | -------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| **Response**   | string  | ✅             | The response from Claude. Format depends on Output Format setting. | Text: `"Hello! How can I help?"` <br> JSON: `{"type":"result","result":"..."}` <br> Stream-JSON: JSONL stream |
+| **Metadata**   | object  | ✅             | Execution metadata including cost, duration, and usage statistics. | `{"cost": 0.0063, "duration": 2257, "session_id": "...", "usage": {...}}`                                     |
+| **Success**    | boolean | ✅             | `true` if execution succeeded, `false` if an error occurred.       | `true` or `false`                                                                                             |
+| **Error**      | string  | ✅             | Error message if execution failed. Empty string on success.        | `""` (success) or `"Claude CLI not found..."` (error)                                                         |
+| **Session ID** | string  | ✅             | UUID of the session. Populated when Session Management is enabled. | `"354f251b-b47f-4552-b01d-74ccd2533ded"`                                                                      |
 
 #### Output Format Behavior
 
 The **Response** port returns different formats based on the **Output Format** setting:
 
 **Text Format:**
+
 ```
 Hello! How can I help you today?
 ```
 
 **JSON Format:**
+
 ```json
 {
   "type": "result",
@@ -172,6 +174,7 @@ Hello! How can I help you today?
 ```
 
 **Stream-JSON Format:**
+
 ```jsonl
 {"type":"text","text":"Hello"}
 {"type":"text","text":"!"}
@@ -186,10 +189,10 @@ The **Metadata** port always returns an object with the following structure:
 
 ```json
 {
-  "cost": 0.0063495,              // Total cost in USD
-  "duration": 2257,                // Execution time in milliseconds
-  "session_id": "354f251b-...",   // Session UUID
-  "model": "claude-sonnet-4-5-20250929",  // Model used
+  "cost": 0.0063495, // Total cost in USD
+  "duration": 2257, // Execution time in milliseconds
+  "session_id": "354f251b-...", // Session UUID
+  "model": "claude-sonnet-4-5-20250929", // Model used
   "usage": {
     "input_tokens": 1,
     "cache_creation_input_tokens": 0,
@@ -224,11 +227,13 @@ The simplest usage - send a prompt and get a text response:
 To maintain context across multiple prompts:
 
 **Initial Turn:**
+
 1. Create a Claude Code Headless node with your first prompt
 2. Enable **Enable Session Management** toggle
 3. Run the node and capture the **Session ID** output
 
 **Subsequent Turns:**
+
 1. Create another Claude Code Headless node with your follow-up prompt
 2. Enable **Enable Session Management** toggle
 3. Set **Session ID** to the captured ID from the first turn, OR
@@ -303,6 +308,7 @@ yarn build
 **Problem:** The node returns an error that Claude CLI is not available.
 
 **Solution:**
+
 - Install Claude Code CLI from [https://code.claude.com](https://code.claude.com)
 - Ensure `claude` is in your PATH by running `claude --version` in terminal
 - Restart Rivet after installing Claude CLI
@@ -312,6 +318,7 @@ yarn build
 **Problem:** Error message about invalid session ID format.
 
 **Solution:**
+
 - Session IDs must be valid UUIDs (e.g., `550e8400-e29b-41d4-a716-446655440000`)
 - Use the **Session ID** output from a previous execution
 - Or enable **Continue Last Session** instead of manually entering an ID
@@ -321,6 +328,7 @@ yarn build
 **Problem:** Claude cannot perform certain operations due to permissions.
 
 **Solution:**
+
 - Check the **Permission Mode** setting
 - Use `acceptEdits` to automatically accept file edits
 - Use `bypassPermissions` to skip permission checks (use with caution)
@@ -331,6 +339,7 @@ yarn build
 **Problem:** When using `json` output format, the response cannot be parsed.
 
 **Solution:**
+
 - Ensure your prompt asks for a specific format
 - The Claude CLI may return text even with `--output-format json` for certain prompts
 - Check the **Error** output for parsing details
@@ -341,6 +350,7 @@ yarn build
 **Problem:** Long-running prompts timeout or fail.
 
 **Solution:**
+
 - The node uses a 10MB buffer for responses (configurable in code)
 - Complex tasks may take time - this is expected behavior
 - Check **Verbose Logging** for detailed execution information
@@ -349,7 +359,8 @@ yarn build
 ## Contributing
 
 Issues and pull requests are welcome! Please visit:
-- GitHub: [https://github.com/lawls/rivet-plugin-claude-code](https://github.com/lawls/rivet-plugin-claude-code)
+
+- GitHub: [https://github.com/cddigi/rivet-plugin-claude-code](https://github.com/cddigi/rivet-plugin-claude-code)
 
 ## License
 

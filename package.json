@@ -1,7 +1,7 @@
 {
   "name": "rivet-plugin-claude-code",
   "packageManager": "yarn@3.5.0",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "Rivet plugin for Claude Code headless mode integration",
   "main": "dist/bundle.js",
@@ -41,7 +41,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lawls/rivet-plugin-claude-code.git"
+    "url": "git+https://github.com/cddigi/rivet-plugin-claude-code.git"
   },
   "keywords": [
     "rivet",
